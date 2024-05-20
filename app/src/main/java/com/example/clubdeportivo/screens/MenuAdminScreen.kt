@@ -41,12 +41,12 @@ fun AdminScreen(navController: NavController){
             Text(text = "Pagar Cuota")
         }
         Button(onClick = {
-            navController.navigate(AppScreens.LoginScreen.route)
+            navController.navigate(AppScreens.ClientsDebtScreen.route)
         }) {
             Text(text = "Clientes Deudores")
         }
         Button(onClick = {
-            navController.navigate(AppScreens.LoginScreen.route)
+            navController.navigate(AppScreens.PrintCredentialsAdminScreen.route)
         }) {
             Text(text = "Imprimir Credenciales")
         }
