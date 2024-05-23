@@ -2,7 +2,6 @@ package com.example.clubdeportivo.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -62,7 +62,7 @@ fun LoginScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(horizontal = 30.dp)
         ) {
-            Image(painter = painterResource(id = R.drawable.logo),
+            Image(painter = painterResource(id = R.drawable.logo_init),
                 contentDescription = stringResource(R.string.splash_image),
                 modifier = Modifier
                     .size(150.dp)
@@ -100,15 +100,21 @@ fun LoginScreen(navController: NavController) {
                     Text("Login")
                 }
 
-                Text(
-                    text = "Olvidaste tu \n" + "contraseña?",
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Red,
+                TextButton(
                     modifier = Modifier
-                        .clickable { navController.navigate(AppScreens.ForgotPasswordScreen.route) }
                         .align(Alignment.CenterVertically)
-                    )
+                        .width(150.dp),
+                    onClick = {
+                        navController.navigate(AppScreens.ForgotPasswordScreen.route)
+                    }) {
+                    Text(
+                        text = "Olvidaste tu \n" + "contraseña?",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red)
+
                 }
+
+            }
 
             Spacer(modifier = Modifier.height(20.dp))
 

@@ -39,15 +39,10 @@ fun Splash() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(painter = painterResource(id = R.drawable.logo),
+        Image(painter = painterResource(id = R.drawable.logo_init),
             contentDescription = stringResource(R.string.splash_image),
             modifier = Modifier
                 .size(250.dp)
-        )
-        Spacer(modifier = Modifier.size(20.dp))
-        Text(text = "Welcome!!",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold
         )
     }
 }
