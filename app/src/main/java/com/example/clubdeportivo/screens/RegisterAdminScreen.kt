@@ -11,21 +11,34 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.room.Room
+import com.example.clubdeportivo.R
 import com.example.clubdeportivo.data.AppDB
 import com.example.clubdeportivo.data.Contract
 import com.example.clubdeportivo.data.UsersEntitie
@@ -45,25 +58,50 @@ fun RegisterAdmin(navController: NavController) {
         .allowMainThreadQueries()
         .build()
     val users = db.userDao()
-
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+
         topBar = {
-            TopAppBar(
-                title = { Text(text = "Register Admin") },
-                navigationIcon = {
-                    Icon(
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clickable {
-                                navController.popBackStack()
-                            },
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Registrar Cliente",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.Black
                     )
-                }
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            modifier = Modifier
+                                .size(36.dp),
+                            painter = painterResource(id = R.drawable.arrow_circle),
+                            contentDescription = "Localized description",
+                            tint = Color.Red
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        nameData.value = ""
+                        passwordData.value = ""
+                    }) {
+                        Icon(
+                            modifier = Modifier
+                                .size(36.dp),
+                            painter = painterResource(id = R.drawable.delete),
+                            contentDescription = "Reset Form",
+                            tint = Color.Red
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
             )
-        } //Top AppBar
+        },
     ) {
 
         Column(
@@ -110,3 +148,4 @@ fun RegisterAdmin(navController: NavController) {
 
     } //Scaffold
 }
+
