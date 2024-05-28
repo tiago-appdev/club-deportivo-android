@@ -1,7 +1,10 @@
 package com.example.clubdeportivo.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -63,6 +66,7 @@ fun LoginScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 30.dp)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Image(painter = painterResource(id = R.drawable.logo_init),
                 contentDescription = stringResource(R.string.splash_image),
@@ -114,7 +118,7 @@ fun LoginScreen(navController: NavController) {
                     shape = RoundedCornerShape(5.dp),
                     modifier = Modifier.width(150.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.scrim,
+                        containerColor = MaterialTheme.colorScheme.onSurface,
                         contentColor = MaterialTheme.colorScheme.surface
                     )
                 ) {
@@ -144,15 +148,19 @@ fun LoginScreen(navController: NavController) {
 
             Button(onClick = {navController.navigate(AppScreens.RegisterUserScreen.route)},
                 enabled = true,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.inverseOnSurface),
                 shape = RoundedCornerShape(5.dp),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
+//                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(5.dp)),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )
                 ) {
                 Text(
-                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                    style = MaterialTheme.typography.titleMedium,
                     text = "Registrarse")
             }
 
@@ -175,7 +183,9 @@ fun LoginField(
             tint = Color(0xFFF14D56)
         )
     }
-    Text(text = "Email",
+    Text(
+        color = MaterialTheme.colorScheme.onBackground,
+        text = "Email",
         modifier = Modifier.padding(start = 10.dp),
         fontWeight = FontWeight.Bold,
         fontSize = MaterialTheme.typography.titleMedium.fontSize)
@@ -228,7 +238,9 @@ fun PasswordField(
             )
         }
     }
-    Text(text = "Contraseña",
+    Text(
+        color = MaterialTheme.colorScheme.onBackground,
+        text = "Contraseña",
         modifier = Modifier.padding( start = 10.dp ),
         fontWeight = FontWeight.Bold,
         fontSize = MaterialTheme.typography.titleMedium.fontSize)
@@ -257,7 +269,7 @@ fun PasswordField(
 }
 fun checkCredentials(creds: Credentials, navController: NavController ): Boolean {
     if (creds.isNotEmpty() && creds.login == "admin") {
-        navController.navigate(AppScreens.MenuUserScreen.route)
+        navController.navigate(AppScreens.MenuAdminScreen.route)
 
     } else {
         Toast.makeText(navController.context, "Login incorrecto", Toast.LENGTH_SHORT).show()

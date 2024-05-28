@@ -48,7 +48,7 @@ fun MenuAdminScreen(navController: NavController){
                 Text(text = "Menu",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleLarge
+                    fontStyle = MaterialTheme.typography.titleLarge.fontStyle
                     )
             },
                 actions = {
@@ -73,7 +73,7 @@ fun AdminScreen(navController: NavController, innerPadding: PaddingValues) {
         modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
-            .background(Color.White),
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -124,13 +124,14 @@ fun AdminScreen(navController: NavController, innerPadding: PaddingValues) {
                     .padding(16.dp)
                     .height(48.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.onSurface
+                )
             ) {
                 Text(
-                    text = "Salir",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    fontStyle = MaterialTheme.typography.titleLarge.fontStyle,
+                    text = "Salir"
                 )
             }
         }
@@ -143,7 +144,7 @@ fun MenuItems(icon: Painter, text: String, onClick: () -> Unit){
     Column(
         modifier = Modifier
             .width(300.dp)
-            .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(8.dp))
             .clickable { onClick() }
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -156,9 +157,8 @@ fun MenuItems(icon: Painter, text: String, onClick: () -> Unit){
             tint = Color(0xFFF14D56)
         )
         Text(
+            fontStyle = MaterialTheme.typography.titleLarge.fontStyle,
             text = text,
-            fontSize = 16.sp,
-            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(top = 16.dp)
         )
     }

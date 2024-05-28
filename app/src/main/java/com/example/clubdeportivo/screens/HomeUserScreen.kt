@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -119,13 +118,13 @@ fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues){
                     .padding(16.dp)
                     .height(48.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.onSurface)
             ) {
                 Text(
-                    text = "Salir",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    fontStyle = MaterialTheme.typography.titleLarge.fontStyle,
+                    text = "Salir"
                 )
             }
         }
@@ -141,7 +140,7 @@ fun MenuItemsUser(icon: Painter,title: String, text: String, onClick: () -> Unit
         modifier = Modifier
             .width(450.dp)
             .height(100.dp)
-            .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(8.dp))
             .clickable { onClick() },
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
@@ -154,16 +153,18 @@ fun MenuItemsUser(icon: Painter,title: String, text: String, onClick: () -> Unit
             verticalArrangement = Arrangement.Top
         ) {
             Text(
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .padding(top = 5.dp),
                 text = title,
+                fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
                 style = MaterialTheme.typography.titleLarge,
             )
 
             Text(
                 modifier = Modifier
                     .padding(top = 10.dp),
-                color = Color(0xFF9B9FA8),
+                color = MaterialTheme.colorScheme.outline,
                 text = text,
                 style = MaterialTheme.typography.bodyLarge,
             )

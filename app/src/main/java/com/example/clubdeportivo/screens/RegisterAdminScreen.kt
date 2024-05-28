@@ -2,6 +2,7 @@ package com.example.clubdeportivo.screens
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -60,7 +61,8 @@ fun RegisterAdmin(navController: NavController) {
     val users = db.userDao()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            .background(MaterialTheme.colorScheme.background),
 
         topBar = {
             CenterAlignedTopAppBar(
@@ -69,7 +71,7 @@ fun RegisterAdmin(navController: NavController) {
                         "Registrar Cliente",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = Color.Black
+                        fontStyle = MaterialTheme.typography.titleLarge.fontStyle
                     )
                 },
                 navigationIcon = {
