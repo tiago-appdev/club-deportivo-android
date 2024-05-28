@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,23 +67,38 @@ fun LoginScreen(navController: NavController) {
             Image(painter = painterResource(id = R.drawable.logo_init),
                 contentDescription = stringResource(R.string.splash_image),
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(100.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(60.dp))
 
-            LoginField(
-                value = credentials.login,
-                onChange = { data -> credentials = credentials.copy(login = data) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            PasswordField(
-                value = credentials.pwd,
-                onChange = { data -> credentials = credentials.copy(pwd = data) },
-                submit = { if (!checkCredentials(credentials, navController)) credentials = Credentials() },
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.Start
+            ) {
+
+                LoginField(
+                    value = credentials.login,
+                    onChange = { data -> credentials = credentials.copy(login = data) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.Start
+            ) {
+                PasswordField(
+                    value = credentials.pwd,
+                    onChange = { data -> credentials = credentials.copy(pwd = data) },
+                    submit = { if (!checkCredentials(credentials, navController)) credentials = Credentials() },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -95,9 +112,16 @@ fun LoginScreen(navController: NavController) {
                     },
                     enabled = true,
                     shape = RoundedCornerShape(5.dp),
-                    modifier = Modifier.width(150.dp)
+                    modifier = Modifier.width(150.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.scrim,
+                        contentColor = MaterialTheme.colorScheme.surface
+                    )
                 ) {
-                    Text("Login")
+                    Text(
+                        style = MaterialTheme.typography.titleSmall,
+                        text ="Login"
+                    )
                 }
 
                 TextButton(
@@ -121,31 +145,40 @@ fun LoginScreen(navController: NavController) {
             Button(onClick = {navController.navigate(AppScreens.RegisterUserScreen.route)},
                 enabled = true,
                 shape = RoundedCornerShape(5.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
                 ) {
-                Text(text = "Registrarse")
+                Text(
+                    style = MaterialTheme.typography.titleSmall,
+                    text = "Registrarse")
             }
 
 
-        }
-    }
+        } // Column
+    } // Surface
 }
 @Composable
 fun LoginField(
     value: String,
     onChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    label: String = "Login",
-    placeholder: String = "Enter your Login"
+    placeholder: String = "Ingresa tu email"
 ){
     val focusManager = LocalFocusManager.current
     val leadingIcon = @Composable {
         Icon(
             Icons.Default.Person,
             contentDescription = "",
-            tint = MaterialTheme.colorScheme.primary
+            tint = Color(0xFFF14D56)
         )
     }
+    Text(text = "Email",
+        modifier = Modifier.padding(start = 10.dp),
+        fontWeight = FontWeight.Bold,
+        fontSize = MaterialTheme.typography.titleMedium.fontSize)
 
     TextField(
         value = value,
@@ -156,10 +189,16 @@ fun LoginField(
         keyboardActions = KeyboardActions(
             onNext = {focusManager.moveFocus(FocusDirection.Down)}
         ),
-        placeholder = { Text(placeholder) },
-        label = { Text(label) },
+        placeholder = {
+            Text(
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = placeholder) },
         singleLine = true,
-        visualTransformation = VisualTransformation.None
+        visualTransformation = VisualTransformation.None,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceDim,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+        )
     )
 }
 
@@ -169,15 +208,14 @@ fun PasswordField(
     onChange: (String) -> Unit,
     submit: () -> Unit,
     modifier: Modifier = Modifier,
-    label: String = "Password",
-    placeholder: String = "Enter your Password"
+    placeholder: String = "Ingresa tu contraseña"
 ) {
     var isPasswordVisible by remember { mutableStateOf(false) }
     val leadingIcon = @Composable {
         Icon(
             Icons.Default.Key,
             contentDescription = "",
-            tint = MaterialTheme.colorScheme.primary
+            tint = Color(0xFFF14D56)
         )
     }
 
@@ -186,11 +224,14 @@ fun PasswordField(
             Icon(
                 if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                 contentDescription = "",
-                tint = MaterialTheme.colorScheme.primary
+                tint = Color(0xFFF14D56)
             )
         }
     }
-
+    Text(text = "Contraseña",
+        modifier = Modifier.padding( start = 10.dp ),
+        fontWeight = FontWeight.Bold,
+        fontSize = MaterialTheme.typography.titleMedium.fontSize)
     TextField(
         value = value,
         onValueChange = onChange,
@@ -202,10 +243,16 @@ fun PasswordField(
             keyboardType = KeyboardType.Password
         ),
         keyboardActions = KeyboardActions(onSend = { submit() }),
-        placeholder = { Text(placeholder) },
-        label = { Text(label) },
+        placeholder = {
+            Text(
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = placeholder) },
         singleLine = true,
-        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
+        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceDim,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+        )
     )
 }
 fun checkCredentials(creds: Credentials, navController: NavController ): Boolean {
