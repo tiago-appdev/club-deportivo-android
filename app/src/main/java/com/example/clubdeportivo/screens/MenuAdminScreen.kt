@@ -57,7 +57,7 @@ fun MenuAdminScreen(navController: NavController){
                             painter = painterResource(id = R.drawable.fitness),
                             modifier = Modifier.width(36.dp),
                             contentDescription = "Fitness Logo",
-                            tint = Color.Red
+                            tint = Color(0xFFF14D56)
                         )
                     }
                 })
@@ -153,7 +153,7 @@ fun MenuItems(icon: Painter, text: String, onClick: () -> Unit){
             contentDescription = text,
             modifier = Modifier
                 .size(50.dp),
-            tint = Color(0xFFDD4B39)
+            tint = Color(0xFFF14D56)
         )
         Text(
             text = text,

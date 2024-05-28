@@ -81,7 +81,7 @@ fun RegisterAdmin(navController: NavController) {
                                 .size(36.dp),
                             painter = painterResource(id = R.drawable.arrow_circle),
                             contentDescription = "Localized description",
-                            tint = Color.Red
+                            tint = Color(0xFFF14D56)
                         )
                     }
                 },
@@ -95,7 +95,7 @@ fun RegisterAdmin(navController: NavController) {
                                 .size(36.dp),
                             painter = painterResource(id = R.drawable.delete),
                             contentDescription = "Reset Form",
-                            tint = Color.Red
+                            tint = Color(0xFFF14D56)
                         )
                     }
                 },

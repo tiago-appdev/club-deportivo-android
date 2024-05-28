@@ -210,7 +210,7 @@ fun PasswordField(
 }
 fun checkCredentials(creds: Credentials, navController: NavController ): Boolean {
     if (creds.isNotEmpty() && creds.login == "admin") {
-        navController.navigate(AppScreens.MenuAdminScreen.route)
+        navController.navigate(AppScreens.MenuUserScreen.route)
 
     } else {
         Toast.makeText(navController.context, "Login incorrecto", Toast.LENGTH_SHORT).show()
