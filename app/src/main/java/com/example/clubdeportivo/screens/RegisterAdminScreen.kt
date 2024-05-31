@@ -168,6 +168,12 @@ fun RegisterAdmin(navController: NavController) {
 
             Spacer(modifier = Modifier.size(30.dp))
 
+            Text(
+                color = MaterialTheme.colorScheme.onBackground,
+                text = "Tipo",
+                modifier = Modifier.padding(start = 10.dp),
+                fontWeight = FontWeight.Bold,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize)
             TypeUser()
 
             Column(
@@ -479,14 +485,6 @@ fun TypeUser(){
     {
 
         TextField(
-            label = {
-                Text(
-                    color = MaterialTheme.colorScheme.onBackground,
-                    text = "Tipo",
-                    modifier = Modifier.padding(start = 10.dp, bottom = 10.dp),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize)
-            },
             readOnly = true,
             value = typeUser,
             onValueChange = {},
