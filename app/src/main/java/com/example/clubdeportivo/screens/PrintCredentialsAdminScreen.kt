@@ -1,5 +1,5 @@
 package com.example.clubdeportivo.screens
-import android.util.Log
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,20 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,14 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.room.Room
@@ -50,9 +42,10 @@ import com.example.clubdeportivo.data.AppDB
 import com.example.clubdeportivo.data.Contract
 import com.example.clubdeportivo.data.UsersEntitie
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrintCredentialsAdminScreen(navController: NavController) {
-    var listUsers = mutableListOf<UsersEntitie>()
+    var listUsers by remember { mutableStateOf(mutableListOf<UsersEntitie>()) }
     val context = LocalContext.current
     val db = Room.databaseBuilder(
         context,
@@ -69,6 +62,22 @@ fun PrintCredentialsAdminScreen(navController: NavController) {
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // TopAppBar
+        TopAppBar(
+            title = { Text(text = "Print Credentials") },
+            navigationIcon = {
+                IconButton(onClick = {
+                    navController.popBackStack()
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.arrow_circle),
+                        contentDescription = "Back",
+                        tint = Color(0xFFF14D56)
+                    )
+                }
+            }
+        )
+
         // Logo
         Image(
             painter = painterResource(id = R.drawable.logo_init),
@@ -93,9 +102,8 @@ fun PrintCredentialsAdminScreen(navController: NavController) {
         // Ver credencial button
         Button(
             onClick = {
-                Log.d("PrintCredentials", "Button clicked")
                 showImage = !showImage
-                      },
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -111,7 +119,7 @@ fun PrintCredentialsAdminScreen(navController: NavController) {
 
         if (showImage) {
             Image(
-                painter = painterResource(id = R.drawable.credential_placeholder_image), // Replace with your image resource ID
+                painter = painterResource(id = R.drawable.credential_placeholder_image),
                 contentDescription = "Image",
                 modifier = Modifier
                     .padding(16.dp)
@@ -147,6 +155,7 @@ fun PrintCredentialsAdminScreen(navController: NavController) {
         }
     }
 }
+
 
 
 //@Composable
