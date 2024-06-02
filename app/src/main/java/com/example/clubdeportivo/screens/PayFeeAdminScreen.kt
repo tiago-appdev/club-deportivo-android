@@ -39,15 +39,15 @@ import com.example.clubdeportivo.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PayFeeAdmin(navController: NavController) {
-    var numeroCliente by remember { mutableStateOf("") }
-    var numeroTarjeta by remember { mutableStateOf("") }
-    var fechaVencimiento by remember { mutableStateOf("") }
+    var clientNumber by remember { mutableStateOf("") }
+    var cardNumber by remember { mutableStateOf("") }
+    var dueDate by remember { mutableStateOf("") }
     var cvc by remember { mutableStateOf("") }
-    var metodoPago by remember { mutableStateOf("Efectivo") }
+    var paymentMethod by remember { mutableStateOf("Efectivo") }
 
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // TopAppBar
@@ -73,8 +73,8 @@ fun PayFeeAdmin(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                value = numeroCliente,
-                onValueChange = { numeroCliente = it },
+                value = clientNumber,
+                onValueChange = { clientNumber = it },
                 label = { Text(text = "Numero de cliente") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.weight(0.7f).padding(8.dp)
@@ -122,19 +122,19 @@ fun PayFeeAdmin(navController: NavController) {
         Column(
             modifier = Modifier
                 .align(Alignment.Start)
-                .padding(horizontal = 16.dp, vertical = 4.dp) // Adjust padding
+                .padding(horizontal = 8.dp, vertical = 8.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = metodoPago == "Efectivo",
-                    onClick = { metodoPago = "Efectivo" },
+                    selected = paymentMethod == "Efectivo",
+                    onClick = { paymentMethod = "Efectivo" },
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
                     text = "Efectivo",
-                    textAlign = TextAlign.Center // Center text
+                    textAlign = TextAlign.Center
                 )
             }
 
@@ -142,41 +142,55 @@ fun PayFeeAdmin(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = metodoPago == "Tarjeta",
-                    onClick = { metodoPago = "Tarjeta" },
+                    selected = paymentMethod == "Tarjeta",
+                    onClick = { paymentMethod = "Tarjeta" },
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
                     text = "Tarjeta",
-                    textAlign = TextAlign.Center // Center text
+                    textAlign = TextAlign.Center
                 )
             }
         }
 
-        // Numero de Tarjeta input
-        OutlinedTextField(
-            value = numeroTarjeta,
-            onValueChange = { numeroTarjeta = it },
-            label = { Text(text = "Numero de Tarjeta") },
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
-        )
+        // Conditionally show card inputs if "Tarjeta" is selected
+        Column(modifier = Modifier.weight(1f)) {
+            if (paymentMethod == "Tarjeta") {
+                // Numero de Tarjeta input
+                OutlinedTextField(
+                    value = cardNumber,
+                    onValueChange = { cardNumber = it },
+                    label = { Text(text = "Numero de Tarjeta") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
-        // Fecha de Vencimiento input
-        OutlinedTextField(
-            value = fechaVencimiento,
-            onValueChange = { fechaVencimiento = it },
-            label = { Text(text = "Fecha de Vencimiento") },
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
-        )
+                // Fecha de Vencimiento input
+                OutlinedTextField(
+                    value = dueDate,
+                    onValueChange = { dueDate = it },
+                    label = { Text(text = "Fecha de Vencimiento") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
-        // CVC input
-        OutlinedTextField(
-            value = cvc,
-            onValueChange = { cvc = it },
-            label = { Text(text = "CVC") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
-        )
+                // CVC input
+                OutlinedTextField(
+                    value = cvc,
+                    onValueChange = { cvc = it },
+                    label = { Text(text = "CVC") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+        }
+
 
         // Pagar Cuota button
         Button(
