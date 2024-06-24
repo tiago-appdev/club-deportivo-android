@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -54,11 +55,60 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
 import com.example.clubdeportivo.navigation.AppScreens
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var credentials by remember { mutableStateOf(Credentials()) }
+    val context = LocalContext.current
+    val auth = remember { FirebaseAuth.getInstance() }
+
+    fun checkUserType(uid: String, navController: NavController) {
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("users").document("wvFM2lzyET9oePZgbskD")
+        docRef.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val document = task.result
+                if (document != null && document.exists()) {
+                    val userType = document.getString("type")
+                    if (userType == "admin") {
+                        navController.navigate(AppScreens.MenuAdminScreen.route)
+                    } else {
+                        navController.navigate(AppScreens.MenuUserScreen.route)
+                    }
+                } else {
+                    Toast.makeText(navController.context, "El usuario no existe en la base de datos", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(navController.context, "Error al verificar el usuario", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun signIn(email: String, password: String) {
+        if (email.isNotEmpty() && password.isNotEmpty()) {
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val user = auth.currentUser
+                        if (user != null) {
+                            val uid = user.uid
+                            checkUserType(uid, navController)
+                        } else {
+                            Toast.makeText(context, "Error al obtener los datos del usuario", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context, "Error al iniciar sesión: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } else {
+            Toast.makeText(context, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
     Surface {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -82,8 +132,8 @@ fun LoginScreen(navController: NavController) {
             ) {
 
                 LoginField(
-                    value = credentials.login,
-                    onChange = { data -> credentials = credentials.copy(login = data) },
+                    value = credentials.email,
+                    onChange = { data -> credentials = credentials.copy(email = data) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -97,7 +147,6 @@ fun LoginScreen(navController: NavController) {
                 PasswordField(
                     value = credentials.pwd,
                     onChange = { data -> credentials = credentials.copy(pwd = data) },
-                    submit = { if (!checkCredentials(credentials, navController)) credentials = Credentials() },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -112,7 +161,7 @@ fun LoginScreen(navController: NavController) {
             ) {
                 Button(
                     onClick = {
-                        if (!checkCredentials(credentials, navController)) credentials = Credentials()
+                        signIn(credentials.email, credentials.pwd)
                     },
                     enabled = true,
                     shape = RoundedCornerShape(5.dp),
@@ -162,7 +211,6 @@ fun LoginScreen(navController: NavController) {
                     style = MaterialTheme.typography.titleMedium,
                     text = "Registrarse")
             }
-
 
         } // Column
     } // Surface
@@ -215,7 +263,7 @@ fun LoginField(
 fun PasswordField(
     value: String,
     onChange: (String) -> Unit,
-    submit: () -> Unit,
+//    submit: () -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = "Ingresa tu contraseña"
 ) {
@@ -253,7 +301,7 @@ fun PasswordField(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
         ),
-        keyboardActions = KeyboardActions(onSend = { submit() }),
+        keyboardActions = KeyboardActions(onDone = null),
         placeholder = {
             Text(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -266,23 +314,7 @@ fun PasswordField(
         )
     )
 }
-fun checkCredentials(creds: Credentials, navController: NavController ): Boolean {
-    if (creds.isNotEmpty() && creds.login == "admin") {
-        navController.navigate(AppScreens.MenuAdminScreen.route)
-
-    } else {
-        Toast.makeText(navController.context, "Login incorrecto", Toast.LENGTH_SHORT).show()
-
-    }
-    return creds.isNotEmpty()
-}
-
 data class Credentials(
-    var login: String = "",
-    var pwd: String = "",
-    var remember: Boolean = false
-) {
-    fun isNotEmpty(): Boolean {
-        return login.isNotEmpty() && pwd.isNotEmpty()
-    }
-}
+    var email: String = "",
+    var pwd: String = ""
+)

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "656971062446",
+    "project_id": "club-deportivo-c7090",
+    "storage_bucket": "club-deportivo-c7090.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656971062446:android:aaae565b832d07a9da213f",
+        "android_client_info": {
+          "package_name": "com.example.clubdeportivo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkwipPQk5Vli3MaAI_1qWzbMsgtHleWZY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
