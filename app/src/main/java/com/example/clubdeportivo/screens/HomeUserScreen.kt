@@ -30,13 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
 import com.example.clubdeportivo.navigation.AppScreens
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -69,6 +68,7 @@ fun MenuUserScreen(navController: NavController){
 
 @Composable
 fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues){
+    val auth = FirebaseAuth.getInstance()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -112,6 +112,7 @@ fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues){
         ) {
             Button(
                 onClick = {
+                    auth.signOut()
                     navController.navigate(AppScreens.LoginScreen.route)
                 },
                 modifier = Modifier

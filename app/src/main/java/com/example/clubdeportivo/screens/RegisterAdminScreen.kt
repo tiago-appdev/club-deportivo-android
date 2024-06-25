@@ -17,8 +17,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Directions
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.Button
@@ -50,17 +50,21 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
+import com.example.clubdeportivo.data.UserData
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RegisterAdmin(navController: NavController) {
-
+    var user by remember { mutableStateOf(UserData()) }
     val context = navController.context
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
@@ -94,7 +98,7 @@ fun RegisterAdmin(navController: NavController) {
                 },
                 actions = {
                     IconButton(onClick = {
-
+                        user = UserData()
                     }) {
                         Icon(
                             modifier = Modifier
@@ -122,8 +126,12 @@ fun RegisterAdmin(navController: NavController) {
             NameField(
                 title = "Nombre",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {}
+                value = user.name,
+                onChange = {
+                    user = user.copy(
+                        name = it
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.size(30.dp))
@@ -131,40 +139,55 @@ fun RegisterAdmin(navController: NavController) {
             SurNameField(
                 title = "Apellido",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.surname,
+                onChange = {
+                    user = user.copy(
+                        surname = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
-            DirectionField(
-                title = "Dirección",
+            PasswordField(
+                title = "Contraseña",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.password,
+                onChange = {
+                    user = user.copy(
+                        password = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
             DNIField(
                 title = "DNI",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.dni,
+                onChange = {
+                    user = user.copy(
+                        dni = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
             PhoneField(
                 title = "Teléfono",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.phone,
+                onChange = {
+                    user = user.copy(
+                        phone = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
             EmailField(
                 title = "Email",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.email,
+                onChange = {
+                    user = user.copy(
+                        email = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
@@ -174,7 +197,10 @@ fun RegisterAdmin(navController: NavController) {
                 modifier = Modifier.padding(start = 10.dp),
                 fontWeight = FontWeight.Bold,
                 fontSize = MaterialTheme.typography.titleMedium.fontSize)
-            TypeUser()
+            TypeUser( value = user.type, onChange = {
+                user = user.copy(
+                    type = it)
+            })
 
             Column(
                 modifier = Modifier
@@ -182,8 +208,9 @@ fun RegisterAdmin(navController: NavController) {
                 verticalArrangement = Arrangement.Bottom,
             ) {
                 Button(onClick = {
-                    Toast.makeText(context, "User created", Toast.LENGTH_SHORT).show()
-                    navController.popBackStack()
+                    registerUser(navController, user)
+                    Toast.makeText(context, "Usuario registrado", Toast.LENGTH_SHORT).show()
+                    user = UserData()
                 },
                     shape = RoundedCornerShape(5.dp),
                     modifier = Modifier
@@ -203,6 +230,33 @@ fun RegisterAdmin(navController: NavController) {
         } //Column
 
     } //Scaffold
+}
+
+fun registerUser( navController: NavController, user: UserData) {
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+
+    auth.createUserWithEmailAndPassword(user.email, user.password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // User registered successfully
+                val firebaseUser = auth.currentUser
+                val userId = firebaseUser?.uid
+
+                if (userId != null) {
+                    db.collection("users").document(userId).set(user)
+                        .addOnSuccessListener {
+                            Toast.makeText(navController.context, "Usuario registrado con éxito", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(navController.context, "Error al registrar el usuario", Toast.LENGTH_SHORT).show()
+                        }
+                }
+            } else {
+                // Registration failed
+                Toast.makeText(navController.context, "Error al registrar: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
 }
 
 @Composable
@@ -296,17 +350,17 @@ fun SurNameField(
 }
 
 @Composable
-fun DirectionField(
+fun PasswordField(
     title: String,
     value: String,
     onChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Ingresa tu dirección"
+    placeholder: String = "Ingresá una contraseña para tu cuenta"
 ){
     val focusManager = LocalFocusManager.current
     val leadingIcon = @Composable {
         Icon(
-            Icons.Default.Directions,
+            Icons.Default.Password,
             contentDescription = "",
             tint = Color(0xFFF14D56)
         )
@@ -323,7 +377,7 @@ fun DirectionField(
         onValueChange = onChange,
         modifier = modifier,
         leadingIcon = leadingIcon,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Password),
         keyboardActions = KeyboardActions(
             onNext = {focusManager.moveFocus(FocusDirection.Down)}
         ),
@@ -368,7 +422,7 @@ fun DNIField(
         onValueChange = onChange,
         modifier = modifier,
         leadingIcon = leadingIcon,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Number),
         keyboardActions = KeyboardActions(
             onNext = {focusManager.moveFocus(FocusDirection.Down)}
         ),
@@ -413,7 +467,7 @@ fun PhoneField(
         onValueChange = onChange,
         modifier = modifier,
         leadingIcon = leadingIcon,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Number),
         keyboardActions = KeyboardActions(
             onNext = {focusManager.moveFocus(FocusDirection.Down)}
         ),
@@ -477,16 +531,16 @@ fun EmailField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TypeUser(){
+fun TypeUser(value: String, onChange: (String) -> Unit){
     var isExpanded by remember { mutableStateOf(false) }
-    var typeUser by remember { mutableStateOf("") }
+//    var typeUser by remember { mutableStateOf("") }
 
     ExposedDropdownMenuBox(expanded = isExpanded, onExpandedChange = { isExpanded = !isExpanded} )
     {
 
         TextField(
             readOnly = true,
-            value = typeUser,
+            value = value,
             onValueChange = {},
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
@@ -505,19 +559,19 @@ fun TypeUser(){
             DropdownMenuItem(
                 text = { Text("Socio") },
                 onClick = {
-                    typeUser = "Socio"
+                    onChange("socio")
                     isExpanded = false })
 
             DropdownMenuItem(
                 text = { Text("No Socio") },
                 onClick = {
-                    typeUser = "No Socio"
+                    onChange("NoSocio")
                     isExpanded = false})
 
             DropdownMenuItem(
                 text = { Text("Administrador") },
                 onClick = {
-                    typeUser = "Administrador"
+                    onChange("admin")
                     isExpanded = false})
         }
     }

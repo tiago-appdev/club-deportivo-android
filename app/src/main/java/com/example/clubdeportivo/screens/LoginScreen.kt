@@ -67,7 +67,7 @@ fun LoginScreen(navController: NavController) {
 
     fun checkUserType(uid: String, navController: NavController) {
         val db = FirebaseFirestore.getInstance()
-        val docRef = db.collection("users").document("wvFM2lzyET9oePZgbskD")
+        val docRef = db.collection("users").document(uid)
         docRef.get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val document = task.result
