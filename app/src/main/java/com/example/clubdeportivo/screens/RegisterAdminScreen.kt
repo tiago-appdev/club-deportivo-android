@@ -559,7 +559,7 @@ fun TypeUser(value: String, onChange: (String) -> Unit){
             DropdownMenuItem(
                 text = { Text("Socio") },
                 onClick = {
-                    onChange("socio")
+                    onChange("Socio")
                     isExpanded = false })
 
             DropdownMenuItem(
@@ -571,7 +571,7 @@ fun TypeUser(value: String, onChange: (String) -> Unit){
             DropdownMenuItem(
                 text = { Text("Administrador") },
                 onClick = {
-                    onChange("admin")
+                    onChange("Admin")
                     isExpanded = false})
         }
     }

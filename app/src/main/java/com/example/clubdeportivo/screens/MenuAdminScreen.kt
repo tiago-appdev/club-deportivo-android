@@ -25,16 +25,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
 import com.example.clubdeportivo.navigation.AppScreens
@@ -121,7 +118,7 @@ fun AdminScreen(navController: NavController, innerPadding: PaddingValues) {
             Button(
                 onClick = {
                             FirebaseAuth.getInstance().signOut()
-                            navController.navigate(AppScreens.LoginScreen.route)
+                            navController.popBackStack( AppScreens.LoginScreen.route, inclusive = false)
                           },
                 modifier = Modifier
                     .padding(16.dp)

@@ -113,7 +113,7 @@ fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues){
             Button(
                 onClick = {
                     auth.signOut()
-                    navController.navigate(AppScreens.LoginScreen.route)
+                    navController.popBackStack( AppScreens.LoginScreen.route, inclusive = false)
                 },
                 modifier = Modifier
                     .padding(16.dp)
