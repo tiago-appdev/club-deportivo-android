@@ -21,12 +21,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -37,53 +40,54 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClientsDebt(navController: NavController) {
-    // Dummy data for demonstration
-    val debtors = listOf(
-        Debtor("Juan Perez", "123456", "2024/05/01", 500),
-        Debtor("Javier Lopez", "789012", "2024/05/10", 750),
-        Debtor("Alicia Rodriguez", "345678", "2024/04/20", 300),
-        Debtor("Luciana Gonzalez", "316712", "2024/01/02", 1200)
-    )
+    // Estado para almacenar los deudores
+    var debtors by remember { mutableStateOf<List<Debtor>>(emptyList()) }
+
+    // Consultar la base de datos
+    LaunchedEffect(Unit) {
+        fetchDebtors { result ->
+            debtors = result
+        }
+    }
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-            modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(20.dp),
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            "Clientes con deudas",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            fontStyle = MaterialTheme.typography.titleLarge.fontStyle
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(20.dp),
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Clientes con deudas",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontStyle = MaterialTheme.typography.titleLarge.fontStyle
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            modifier = Modifier.size(36.dp),
+                            painter = painterResource(id = R.drawable.arrow_circle),
+                            contentDescription = "Localized description",
+                            tint = Color(0xFFF14D56)
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            navController.popBackStack()
-                        }) {
-                            Icon(
-                                modifier = Modifier
-                                    .size(36.dp),
-                                painter = painterResource(id = R.drawable.arrow_circle),
-                                contentDescription = "Localized description",
-                                tint = Color(0xFFF14D56)
-                            )
-                        }
-                    },
-
-                    scrollBehavior = scrollBehavior,
-                )
-            },
-
-    ) {innerPadding ->
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+            )
+        },
+    ) { innerPadding ->
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)) {
@@ -91,7 +95,27 @@ fun ClientsDebt(navController: NavController) {
             DebtorList(debtors)
         }
     }
+}
 
+fun fetchDebtors(onComplete: (List<Debtor>) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    db.collection("fees")
+        .whereEqualTo("paymentstatus", "pending")
+        .get()
+        .addOnSuccessListener { result ->
+            val debtorsList = result.map { document ->
+                Debtor(
+                    name = "Nombre", // Ajusta esto según tu estructura de datos
+                    clientNumber = document.getString("clientdni") ?: "",
+                    startDate = document.getDate("duedate").toString().substring(0, 10),
+                    amount = document.getDouble("amount")?.toInt() ?: 0
+                )
+            }
+            onComplete(debtorsList)
+        }
+        .addOnFailureListener { exception ->
+            // Manejar errores aquí
+        }
 }
 
 @Composable
@@ -117,8 +141,7 @@ fun DebtorItem(debtor: Debtor) {
             )
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -131,13 +154,20 @@ fun DebtorItem(debtor: Debtor) {
                     fontWeight = FontWeight.Bold
                 )
             }
-            Text(text = "Número de cliente: ${debtor.clientNumber}", textAlign = TextAlign.End,
-                fontWeight = FontWeight.Light)
-            Text(text = "Desde el ${debtor.startDate}", textAlign = TextAlign.End,
-                fontWeight = FontWeight.Light)
+            Text(
+                text = "Número de cliente: ${debtor.clientNumber}",
+                textAlign = TextAlign.End,
+                fontWeight = FontWeight.Light
+            )
+            Text(
+                text = "Desde el ${debtor.startDate}",
+                textAlign = TextAlign.End,
+                fontWeight = FontWeight.Light
+            )
         }
     }
 }
+
 
 
 
