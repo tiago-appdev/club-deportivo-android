@@ -16,8 +16,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Directions
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.Button
@@ -34,6 +34,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
@@ -47,11 +51,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
+import com.example.clubdeportivo.data.UserData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterUser(navController: NavController) {
-
+    var user by remember { mutableStateOf(UserData()) }
     val context = navController.context
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     Scaffold(
@@ -84,7 +89,7 @@ fun RegisterUser(navController: NavController) {
                 },
                 actions = {
                     IconButton(onClick = {
-
+                        user = UserData()
                     }) {
                         Icon(
                             modifier = Modifier
@@ -112,8 +117,12 @@ fun RegisterUser(navController: NavController) {
             NameUserField(
                 title = "Nombre",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {}
+                value = user.name,
+                onChange = {
+                    user = user.copy(
+                        name = it
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.size(30.dp))
@@ -121,40 +130,55 @@ fun RegisterUser(navController: NavController) {
             SurNameUserField(
                 title = "Apellido",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.surname,
+                onChange = {
+                    user = user.copy(
+                        surname = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
-            DirectionUserField(
-                title = "Dirección",
+            PasswordUserField(
+                title = "Contraseña",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.password,
+                onChange = {
+                    user = user.copy(
+                        password = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
             DNIUserField(
                 title = "DNI",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.dni,
+                onChange = {
+                    user = user.copy(
+                        dni = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
             PhoneUserField(
                 title = "Teléfono",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.phone,
+                onChange = {
+                    user = user.copy(
+                        phone = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
             EmailUserField(
                 title = "Email",
                 modifier = Modifier.width(420.dp),
-                value = "",
-                onChange = {})
+                value = user.email,
+                onChange = {
+                    user = user.copy(
+                        email = it)
+                })
 
             Spacer(modifier = Modifier.size(30.dp))
 
@@ -164,7 +188,9 @@ fun RegisterUser(navController: NavController) {
                 verticalArrangement = Arrangement.Bottom,
             ) {
                 Button(onClick = {
-                    Toast.makeText(context, "User created", Toast.LENGTH_SHORT).show()
+                    registerUser(navController, user)
+                    Toast.makeText(context, "Usuario registrado", Toast.LENGTH_SHORT).show()
+                    user = UserData()
                     navController.popBackStack()
                 },
                     shape = RoundedCornerShape(5.dp),
@@ -278,17 +304,17 @@ fun SurNameUserField(
 }
 
 @Composable
-fun DirectionUserField(
+fun PasswordUserField(
     title: String,
     value: String,
     onChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Ingresa tu dirección"
+    placeholder: String = "Ingresa una contraseña para tu cuenta"
 ){
     val focusManager = LocalFocusManager.current
     val leadingIcon = @Composable {
         Icon(
-            Icons.Default.Directions,
+            Icons.Default.Password,
             contentDescription = "",
             tint = Color(0xFFF14D56)
         )
