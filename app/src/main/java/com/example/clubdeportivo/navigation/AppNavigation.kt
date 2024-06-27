@@ -16,7 +16,7 @@ import com.example.clubdeportivo.screens.RegisterAdmin
 import com.example.clubdeportivo.screens.RegisterUser
 import com.example.clubdeportivo.screens.SplashScreen
 
-@Composable()
+@Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = AppScreens.SplashScreen.route) {
@@ -32,8 +32,9 @@ fun AppNavigation() {
         composable(route = AppScreens.RegisterUserScreen.route) {
             RegisterUser(navController)
         }
-        composable(route = AppScreens.MenuUserScreen.route) {
-            MenuUserScreen(navController)
+        composable(route = AppScreens.MenuUserScreen.route) { backStackEntry ->
+            val uid = backStackEntry.arguments?.getString("uid") ?: ""
+            MenuUserScreen(navController, uid)
         }
         composable(route = AppScreens.MenuAdminScreen.route) {
             MenuAdminScreen(navController)
@@ -52,4 +53,5 @@ fun AppNavigation() {
         }
     }
 }
+
 
