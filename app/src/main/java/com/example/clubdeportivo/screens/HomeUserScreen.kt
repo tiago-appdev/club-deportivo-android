@@ -109,8 +109,10 @@ fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues, c
         MenuItemsUser(
             icon = painterResource(id = R.drawable.attach_money),
             title = "Vencimiento de cuota",
-            text = formatDateToLocale(dueDate, Locale("es", "ES"))
-        ) {}
+            text = formatDateToLocale(dueDate, Locale("es", "ES")),
+        ) {
+            navController.navigate(AppScreens.PayFeeUserScreen.route)
+        }
         Spacer(modifier = Modifier.height(32.dp))
 
         MenuItemsUser(

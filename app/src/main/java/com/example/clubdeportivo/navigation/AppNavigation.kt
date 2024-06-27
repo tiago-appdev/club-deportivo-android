@@ -11,6 +11,7 @@ import com.example.clubdeportivo.screens.LoginScreen
 import com.example.clubdeportivo.screens.MenuAdminScreen
 import com.example.clubdeportivo.screens.MenuUserScreen
 import com.example.clubdeportivo.screens.PayFeeAdmin
+import com.example.clubdeportivo.screens.PayFeeUser
 import com.example.clubdeportivo.screens.PrintCredentialsAdminScreen
 import com.example.clubdeportivo.screens.RegisterAdmin
 import com.example.clubdeportivo.screens.RegisterUser
@@ -44,6 +45,9 @@ fun AppNavigation() {
         }
         composable(route = AppScreens.PayFeeAdminScreen.route) {
             PayFeeAdmin(navController)
+        }
+        composable(route = AppScreens.PayFeeUserScreen.route) {
+            PayFeeUser(navController)
         }
         composable(route = AppScreens.ClientsDebtScreen.route) {
             ClientsDebt(navController)
