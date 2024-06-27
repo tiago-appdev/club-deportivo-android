@@ -41,6 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,20 +107,52 @@ fun fetchDebtors(onComplete: (List<Debtor>) -> Unit) {
         .whereEqualTo("paymentstatus", "pending")
         .get()
         .addOnSuccessListener { result ->
-            val debtorsList = result.map { document ->
-                Debtor(
-                    name = "Nombre", // Ajusta esto según tu estructura de datos
-                    clientNumber = document.getString("clientdni") ?: "",
-                    startDate = document.getDate("duedate").toString().substring(0, 10),
-                    amount = document.getDouble("amount")?.toInt() ?: 0
-                )
+            val debtorsList = mutableListOf<Debtor>()
+
+            for (document in result) {
+                val clientDni = document.getString("clientdni") ?: ""
+                val dueDate = document.getDate("duedate")
+                val formattedDate = formatDateToLocale(dueDate, Locale("es", "ES"))
+
+                db.collection("users")
+                    .whereEqualTo("dni", clientDni)
+                    .get()
+                    .addOnSuccessListener { userResult ->
+                        if (!userResult.isEmpty) {
+                            val userDocument = userResult.documents[0]
+                            val userName = userDocument.getString("name") ?: "Nombre no encontrado"
+
+                            val debtor = Debtor(
+                                name = userName,
+                                clientNumber = clientDni,
+                                startDate = formattedDate,
+                                amount = document.getDouble("amount")?.toInt() ?: 0
+                            )
+                            debtorsList.add(debtor)
+                        }
+                        if (debtorsList.size == result.size()) {
+                            onComplete(debtorsList)
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                    }
             }
-            onComplete(debtorsList)
         }
         .addOnFailureListener { exception ->
-            // Manejar errores aquí
         }
 }
+
+fun formatDateToLocale(date: Date?, locale: Locale): String {
+    return if (date != null) {
+        val formatter = SimpleDateFormat("yyyy/MM/dd", locale)
+        formatter.format(date)
+    } else {
+        ""
+    }
+}
+
+
+
 
 @Composable
 fun DebtorList(debtors: List<Debtor>) {
