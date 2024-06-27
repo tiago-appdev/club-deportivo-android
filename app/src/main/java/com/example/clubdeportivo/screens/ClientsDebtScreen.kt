@@ -103,6 +103,8 @@ fun ClientsDebt(navController: NavController) {
 
 fun fetchDebtors(onComplete: (List<Debtor>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
+    val currentDate = Date()
+
     db.collection("fees")
         .whereEqualTo("paymentstatus", "pending")
         .get()
@@ -112,39 +114,46 @@ fun fetchDebtors(onComplete: (List<Debtor>) -> Unit) {
             for (document in result) {
                 val clientDni = document.getString("clientdni") ?: ""
                 val dueDate = document.getDate("duedate")
-                val formattedDate = formatDateToLocale(dueDate, Locale("es", "ES"))
 
-                db.collection("users")
-                    .whereEqualTo("dni", clientDni)
-                    .get()
-                    .addOnSuccessListener { userResult ->
-                        if (!userResult.isEmpty) {
-                            val userDocument = userResult.documents[0]
-                            val userName = userDocument.getString("name") ?: "Nombre no encontrado"
+                if (dueDate != null && dueDate.before(currentDate)) {
+                    val formattedDate = formatDateToLocale(dueDate, Locale("es", "ES"))
 
-                            val debtor = Debtor(
-                                name = userName,
-                                clientNumber = clientDni,
-                                startDate = formattedDate,
-                                amount = document.getDouble("amount")?.toInt() ?: 0
-                            )
-                            debtorsList.add(debtor)
+                    db.collection("users")
+                        .whereEqualTo("dni", clientDni)
+                        .get()
+                        .addOnSuccessListener { userResult ->
+                            if (!userResult.isEmpty) {
+                                val userDocument = userResult.documents[0]
+                                val userName = userDocument.getString("name") ?: "Name not found"
+
+                                val debtor = Debtor(
+                                    name = userName,
+                                    clientNumber = clientDni,
+                                    startDate = formattedDate,
+                                    amount = document.getDouble("amount")?.toInt() ?: 0
+                                )
+                                debtorsList.add(debtor)
+                            }
+                            if (debtorsList.size == result.size()) {
+                                onComplete(debtorsList)
+                            }
                         }
-                        if (debtorsList.size == result.size()) {
-                            onComplete(debtorsList)
+                        .addOnFailureListener { exception ->
                         }
-                    }
-                    .addOnFailureListener { exception ->
-                    }
+                }
+            }
+            if (debtorsList.size == result.size()) {
+                onComplete(debtorsList)
             }
         }
         .addOnFailureListener { exception ->
         }
 }
 
+
 fun formatDateToLocale(date: Date?, locale: Locale): String {
     return if (date != null) {
-        val formatter = SimpleDateFormat("yyyy/MM/dd", locale)
+        val formatter = SimpleDateFormat("dd/MM/yy", locale)
         formatter.format(date)
     } else {
         ""
