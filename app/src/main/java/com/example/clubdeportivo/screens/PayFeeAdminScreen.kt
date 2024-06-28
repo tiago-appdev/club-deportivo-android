@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +54,9 @@ fun PayFeeAdmin(navController: NavController) {
     var dueDate by remember { mutableStateOf("") }
     var cvc by remember { mutableStateOf("") }
     var paymentMethod by remember { mutableStateOf("Efectivo") }
+    var totalAmount by remember { mutableDoubleStateOf(0.0) }
+    var successMessage by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
@@ -87,7 +92,7 @@ fun PayFeeAdmin(navController: NavController) {
             )
         },
 
-    ) {innerPadding ->
+        ) { innerPadding ->
 
         Column(
             modifier = Modifier
@@ -114,9 +119,31 @@ fun PayFeeAdmin(navController: NavController) {
                         .weight(0.7f)
                         .padding(bottom = 8.dp)
                 )
+                //Función para buscar saldos impagos con el dni ingresado
+                fun fetchUserFees(clientDni: String, onComplete: (Double) -> Unit) {
+                    val db = FirebaseFirestore.getInstance()
+                    val feesRef = db.collection("fees")
+                        .whereEqualTo("clientdni", clientDni)
+                        .whereEqualTo("paymentstatus", "pending")
+
+                    feesRef.get()
+                        .addOnSuccessListener { feesDocs ->
+                            val calculatedAmount =
+                                feesDocs.documents.sumOf { it.getDouble("amount") ?: 0.0 }
+                            onComplete(calculatedAmount)
+                        }
+                        .addOnFailureListener {
+                            errorMessage="Ocurrió un error al procesar la solicitud"
+                        }
+                }
+
 
                 Button(
+                    //Llamamos a la función al dar click en "Verificar"
                     onClick = {
+                        fetchUserFees(clientNumber) { amount ->
+                            totalAmount = amount
+                        }
                     },
                     modifier = Modifier
                         .padding(8.dp)
@@ -130,7 +157,6 @@ fun PayFeeAdmin(navController: NavController) {
                     Text(text = "Verificar", maxLines = 1) // Ensure text stays on one line
                 }
 
-
             }// Row
 
             Column(
@@ -141,7 +167,7 @@ fun PayFeeAdmin(navController: NavController) {
             ) {
                 // Monto field
                 OutlinedTextField(
-                    value = "$ Monto a pagar",
+                    value = "$ $totalAmount",
                     onValueChange = { /* Nothing */ },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -252,12 +278,35 @@ fun PayFeeAdmin(navController: NavController) {
                     )
                 }
             }
+            //Función para actualizar las cuotas a pagadas al clickear botón "Pagar cuota"
+            fun updatePaymentStatus(clientDni: String) {
+                val db = FirebaseFirestore.getInstance()
 
+                val feesRef = db.collection("fees").whereEqualTo("clientdni", clientDni)
+                    .whereEqualTo("paymentstatus", "pending")
+                feesRef.get().addOnSuccessListener { feesDocs ->
+                    feesDocs.documents.forEach { feeDoc ->
+                        val feeId = feeDoc.id
+                        val feeRef = db.collection("fees").document(feeId)
+
+                        // Cambiar el estado a "pagado"
+                        feeRef.update("paymentstatus", "paid").addOnSuccessListener {
+                            successMessage =
+                                "Cuota pagada exitosamente" //
+                            totalAmount = 0.0 // Se debería reiniciar el totalAmount a 0 después de prcesar la solicitud
+                        }.addOnFailureListener {
+                            errorMessage="Ocurrió un error al procesar la solicitud"
+                        }
+                    }
+                }.addOnFailureListener {
+                    errorMessage="Ocurrió un error al procesar la solicitud"
+                }
+            }
 
             // Pagar Cuota button
             Button(
                 onClick = {
-                    // Handle payment
+                    updatePaymentStatus(clientNumber)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -271,9 +320,19 @@ fun PayFeeAdmin(navController: NavController) {
             ) {
                 Text(text = "Pagar Cuota")
             }
+            // Mensaje que confirma pago de cuota
+            if (successMessage.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = successMessage,
+                    color = Color.Green,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+
         }
 
     }
-
 }
 
