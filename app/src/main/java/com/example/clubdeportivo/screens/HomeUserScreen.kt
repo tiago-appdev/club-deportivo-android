@@ -59,7 +59,9 @@ fun MenuUserScreen(navController: NavController, uid: String) {
         fetchUserData(uid) { dni, date ->
             Log.d("MenuUserScreen", "Fetched DNI: $dni, Fetched Date: $date")
             clientDni = dni
-            dueDate = date
+            if (date != null) {
+                dueDate = date
+            }
         }
     }
 
@@ -202,7 +204,7 @@ fun MenuItemsUser(icon: Painter, title: String, text: String, onClick: () -> Uni
     }
 }
 
-fun fetchUserData(uid: String, onComplete: (String, Date) -> Unit) {
+fun fetchUserData(uid: String, onComplete: (String, Date?) -> Unit) {
     val db = FirebaseFirestore.getInstance()
     val userRef = db.collection("users").document(uid)
 
@@ -215,9 +217,14 @@ fun fetchUserData(uid: String, onComplete: (String, Date) -> Unit) {
             .limit(1)
 
         feesRef.get().addOnSuccessListener { feesDocs ->
-            val dueDate = feesDocs.documents[0].getDate("duedate") ?: Date()
-            Log.d("MenuUserScreen", "Due Date: $dueDate")
-            onComplete(clientDni, dueDate)
+            if (!feesDocs.isEmpty) {
+                val dueDate = feesDocs.documents[0].getDate("duedate") ?: Date()
+                Log.d("MenuUserScreen", "Due Date: $dueDate")
+                onComplete(clientDni, dueDate)
+            } else {
+                Log.d("MenuUserScreen", "No fees found for client DNI: $clientDni")
+                onComplete(clientDni, null) // Call onComplete with null for dueDate if no fees are found
+            }
         }.addOnFailureListener { e ->
             Log.e("MenuUserScreen", "Error fetching fees: ", e)
         }
@@ -225,3 +232,4 @@ fun fetchUserData(uid: String, onComplete: (String, Date) -> Unit) {
         Log.e("MenuUserScreen", "Error fetching user data: ", e)
     }
 }
+
