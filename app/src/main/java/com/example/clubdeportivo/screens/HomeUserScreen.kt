@@ -1,6 +1,7 @@
 package com.example.clubdeportivo.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,16 +41,33 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
 import com.example.clubdeportivo.navigation.AppScreens
+import com.example.clubdeportivo.utils.formatDateToLocale
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MenuUserScreen(navController: NavController){
+fun MenuUserScreen(navController: NavController, uid: String) {
+    var clientDni by remember { mutableStateOf("") }
+    var dueDate by remember { mutableStateOf(Date()) }
+
+    LaunchedEffect(uid) {
+        fetchUserData(uid) { dni, date ->
+            Log.d("MenuUserScreen", "Fetched DNI: $dni, Fetched Date: $date")
+            clientDni = dni
+            dueDate = date
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(title = {
-                Text(text = "Menu",
+                Text(
+                    text = "Menu",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge
@@ -61,13 +84,13 @@ fun MenuUserScreen(navController: NavController){
                     }
                 })
         } // TopBar
-    ) {innerPadding ->
-        HomeBodyContent(navController, innerPadding)
+    ) { innerPadding ->
+        HomeBodyContent(navController, innerPadding, clientDni, dueDate)
     }
 }
 
 @Composable
-fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues){
+fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues, clientDni: String, dueDate: Date) {
     val auth = FirebaseAuth.getInstance()
     Column(
         modifier = Modifier
@@ -79,29 +102,31 @@ fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues){
         MenuItemsUser(
             icon = painterResource(id = R.drawable.person),
             title = "Número de Cliente",
-            text = "ABC123",
-        ){}
+            text = clientDni,
+        ) {}
         Spacer(modifier = Modifier.height(32.dp))
 
         MenuItemsUser(
             icon = painterResource(id = R.drawable.attach_money),
             title = "Vencimiento de cuota",
-            text = "15 JUN, 2024",
-        ){}
+            text = formatDateToLocale(dueDate, Locale("es", "ES")),
+        ) {
+            navController.navigate(AppScreens.PayFeeUserScreen.route)
+        }
         Spacer(modifier = Modifier.height(32.dp))
 
         MenuItemsUser(
             icon = painterResource(id = R.drawable.list),
             title = "Actividades",
             text = "Yoga",
-        ){}
+        ) {}
         Spacer(modifier = Modifier.height(32.dp))
 
         MenuItemsUser(
             icon = painterResource(id = R.drawable.print),
             title = "Ver / Imprimir credencial",
             text = "Ver credencial",
-        ){}
+        ) {}
         Spacer(modifier = Modifier.height(32.dp))
 
         Row(
@@ -113,7 +138,7 @@ fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues){
             Button(
                 onClick = {
                     auth.signOut()
-                    navController.popBackStack( AppScreens.LoginScreen.route, inclusive = false, saveState = false)
+                    navController.popBackStack(AppScreens.LoginScreen.route, inclusive = false, saveState = false)
                 },
                 modifier = Modifier
                     .padding(16.dp)
@@ -129,14 +154,11 @@ fun HomeBodyContent(navController: NavController, innerPadding: PaddingValues){
                 )
             }
         }
-
     }
 }
 
-
 @Composable
-fun MenuItemsUser(icon: Painter,title: String, text: String, onClick: () -> Unit){
-
+fun MenuItemsUser(icon: Painter, title: String, text: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .width(450.dp)
@@ -148,7 +170,7 @@ fun MenuItemsUser(icon: Painter,title: String, text: String, onClick: () -> Unit
     ) {
         Column(
             modifier = Modifier
-                .width( 250.dp)
+                .width(250.dp)
                 .height(80.dp),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Top
@@ -178,6 +200,28 @@ fun MenuItemsUser(icon: Painter,title: String, text: String, onClick: () -> Unit
             tint = Color(0xFFF14D56)
         )
     }
+}
 
+fun fetchUserData(uid: String, onComplete: (String, Date) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    val userRef = db.collection("users").document(uid)
 
+    userRef.get().addOnSuccessListener { userDoc ->
+        val clientDni = userDoc.getString("dni") ?: ""
+        Log.d("MenuUserScreen", "Client DNI: $clientDni")  // Debug log for clientDni
+
+        val feesRef = db.collection("fees").whereEqualTo("clientdni", clientDni)
+            .orderBy("duedate", Query.Direction.DESCENDING)
+            .limit(1)
+
+        feesRef.get().addOnSuccessListener { feesDocs ->
+            val dueDate = feesDocs.documents[0].getDate("duedate") ?: Date()
+            Log.d("MenuUserScreen", "Due Date: $dueDate")
+            onComplete(clientDni, dueDate)
+        }.addOnFailureListener { e ->
+            Log.e("MenuUserScreen", "Error fetching fees: ", e)
+        }
+    }.addOnFailureListener { e ->
+        Log.e("MenuUserScreen", "Error fetching user data: ", e)
+    }
 }

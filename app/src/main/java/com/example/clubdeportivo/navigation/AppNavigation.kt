@@ -11,12 +11,13 @@ import com.example.clubdeportivo.screens.LoginScreen
 import com.example.clubdeportivo.screens.MenuAdminScreen
 import com.example.clubdeportivo.screens.MenuUserScreen
 import com.example.clubdeportivo.screens.PayFeeAdmin
+import com.example.clubdeportivo.screens.PayFeeUser
 import com.example.clubdeportivo.screens.PrintCredentialsAdminScreen
 import com.example.clubdeportivo.screens.RegisterAdmin
 import com.example.clubdeportivo.screens.RegisterUser
 import com.example.clubdeportivo.screens.SplashScreen
 
-@Composable()
+@Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = AppScreens.SplashScreen.route) {
@@ -32,8 +33,9 @@ fun AppNavigation() {
         composable(route = AppScreens.RegisterUserScreen.route) {
             RegisterUser(navController)
         }
-        composable(route = AppScreens.MenuUserScreen.route) {
-            MenuUserScreen(navController)
+        composable(route = AppScreens.MenuUserScreen.route) { backStackEntry ->
+            val uid = backStackEntry.arguments?.getString("uid") ?: ""
+            MenuUserScreen(navController, uid)
         }
         composable(route = AppScreens.MenuAdminScreen.route) {
             MenuAdminScreen(navController)
@@ -44,6 +46,9 @@ fun AppNavigation() {
         composable(route = AppScreens.PayFeeAdminScreen.route) {
             PayFeeAdmin(navController)
         }
+        composable(route = AppScreens.PayFeeUserScreen.route) {
+            PayFeeUser(navController)
+        }
         composable(route = AppScreens.ClientsDebtScreen.route) {
             ClientsDebt(navController)
         }
@@ -52,4 +57,5 @@ fun AppNavigation() {
         }
     }
 }
+
 

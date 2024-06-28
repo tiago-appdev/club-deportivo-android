@@ -75,7 +75,7 @@ fun LoginScreen(navController: NavController) {
                     if (userType == "Admin") {
                         navController.navigate(AppScreens.MenuAdminScreen.route)
                     } else {
-                        navController.navigate(AppScreens.MenuUserScreen.route)
+                        navController.navigate(AppScreens.MenuUserScreen.createRoute(uid))
                     }
                 } else {
                     Toast.makeText(navController.context, "El usuario no existe en la base de datos", Toast.LENGTH_SHORT).show()
@@ -85,6 +85,7 @@ fun LoginScreen(navController: NavController) {
             }
         }
     }
+
 
     fun signIn(email: String, password: String) {
         if (email.isNotEmpty() && password.isNotEmpty()) {

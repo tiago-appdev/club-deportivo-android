@@ -40,8 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.clubdeportivo.R
+import com.example.clubdeportivo.utils.formatDateToLocale
 import com.google.firebase.firestore.FirebaseFirestore
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -149,18 +149,6 @@ fun fetchDebtors(onComplete: (List<Debtor>) -> Unit) {
         .addOnFailureListener { exception ->
         }
 }
-
-
-fun formatDateToLocale(date: Date?, locale: Locale): String {
-    return if (date != null) {
-        val formatter = SimpleDateFormat("dd/MM/yy", locale)
-        formatter.format(date)
-    } else {
-        ""
-    }
-}
-
-
 
 
 @Composable
