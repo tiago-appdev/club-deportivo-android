@@ -223,7 +223,7 @@ fun fetchUserData(uid: String, onComplete: (String, Date?) -> Unit) {
                 onComplete(clientDni, dueDate)
             } else {
                 Log.d("MenuUserScreen", "No fees found for client DNI: $clientDni")
-                onComplete(clientDni, null) // Call onComplete with null for dueDate if no fees are found
+                onComplete(clientDni, null)
             }
         }.addOnFailureListener { e ->
             Log.e("MenuUserScreen", "Error fetching fees: ", e)

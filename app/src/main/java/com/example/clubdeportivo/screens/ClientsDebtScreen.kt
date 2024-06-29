@@ -202,8 +202,6 @@ fun DebtorItem(debtor: Debtor) {
 }
 
 
-
-
 data class Debtor(
     val name: String,
     val clientNumber: String,
