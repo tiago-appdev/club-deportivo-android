@@ -226,7 +226,6 @@ fun RegisterAdmin(navController: NavController) {
             Button(
                 onClick = {
                     registerUser(navController, user)
-                    Toast.makeText(context, "Usuario registrado", Toast.LENGTH_SHORT).show()
                     user = UserData()
                 },
                 shape = RoundedCornerShape(5.dp),
@@ -549,7 +548,6 @@ fun EmailField(
 @Composable
 fun TypeUser(value: String, onChange: (String) -> Unit){
     var isExpanded by remember { mutableStateOf(false) }
-//    var typeUser by remember { mutableStateOf("") }
 
     ExposedDropdownMenuBox(expanded = isExpanded, onExpandedChange = { isExpanded = !isExpanded} )
     {
