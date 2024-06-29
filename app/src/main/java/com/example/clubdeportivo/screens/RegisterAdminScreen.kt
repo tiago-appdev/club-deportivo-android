@@ -4,16 +4,19 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Email
@@ -41,7 +44,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
@@ -112,141 +114,127 @@ fun RegisterAdmin(navController: NavController) {
                 scrollBehavior = scrollBehavior,
             )
         },
-    ) { innerPadding ->
+    ) {innerPadding ->
 
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Center
         ) {
-            LazyColumn(
+
+            Spacer(modifier = Modifier.size(40.dp))
+
+            NameField(
+                title = "Nombre",
+                modifier = Modifier.width(420.dp),
+                value = user.name,
+                onChange = {
+                    user = user.copy(
+                        name = it
+                    )
+                }
+            )
+
+            Spacer(modifier = Modifier.size(30.dp))
+
+            SurNameField(
+                title = "Apellido",
+                modifier = Modifier.width(420.dp),
+                value = user.surname,
+                onChange = {
+                    user = user.copy(
+                        surname = it)
+                })
+
+            Spacer(modifier = Modifier.size(30.dp))
+
+            PasswordField(
+                title = "Contraseña",
+                modifier = Modifier.width(420.dp),
+                value = user.password,
+                onChange = {
+                    user = user.copy(
+                        password = it)
+                })
+
+            Spacer(modifier = Modifier.size(30.dp))
+
+            DNIField(
+                title = "DNI",
+                modifier = Modifier.width(420.dp),
+                value = user.dni,
+                onChange = {
+                    user = user.copy(
+                        dni = it)
+                })
+
+            Spacer(modifier = Modifier.size(30.dp))
+
+            PhoneField(
+                title = "Teléfono",
+                modifier = Modifier.width(420.dp),
+                value = user.phone,
+                onChange = {
+                    user = user.copy(
+                        phone = it)
+                })
+
+            Spacer(modifier = Modifier.size(30.dp))
+
+            EmailField(
+                title = "Email",
+                modifier = Modifier.width(420.dp),
+                value = user.email,
+                onChange = {
+                    user = user.copy(
+                        email = it)
+                })
+
+            Spacer(modifier = Modifier.size(30.dp))
+
+            Text(
+                color = MaterialTheme.colorScheme.onBackground,
+                text = "Tipo",
+                modifier = Modifier.padding(start = 10.dp),
+                fontWeight = FontWeight.Bold,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize)
+            TypeUser( value = user.type, onChange = {
+                user = user.copy(
+                    type = it)
+            })
+
+            Column(
                 modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(30.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Bottom,
             ) {
-
-                item { Spacer(modifier = Modifier.size(40.dp)) }
-
-                item {
-                    NameField(
-                        title = "Nombre",
-                        modifier = Modifier.fillMaxWidth(),
-                        value = user.name,
-                        onChange = {
-                            user = user.copy(
-                                name = it
-                            )
-                        }
-                    )
-                }
-
-                item {
-                    SurNameField(
-                        title = "Apellido",
-                        modifier = Modifier.fillMaxWidth(),
-                        value = user.surname,
-                        onChange = {
-                            user = user.copy(
-                                surname = it
-                            )
-                        }
-                    )
-                }
-
-                item {
-                    PasswordField(
-                        title = "Contraseña",
-                        modifier = Modifier.fillMaxWidth(),
-                        value = user.password,
-                        onChange = {
-                            user = user.copy(
-                                password = it
-                            )
-                        }
-                    )
-                }
-
-                item {
-                    DNIField(
-                        title = "DNI",
-                        modifier = Modifier.fillMaxWidth(),
-                        value = user.dni,
-                        onChange = {
-                            user = user.copy(
-                                dni = it
-                            )
-                        }
-                    )
-                }
-
-                item {
-                    PhoneField(
-                        title = "Teléfono",
-                        modifier = Modifier.fillMaxWidth(),
-                        value = user.phone,
-                        onChange = {
-                            user = user.copy(
-                                phone = it
-                            )
-                        }
-                    )
-                }
-
-                item {
-                    EmailField(
-                        title = "Email",
-                        modifier = Modifier.fillMaxWidth(),
-                        value = user.email,
-                        onChange = {
-                            user = user.copy(
-                                email = it
-                            )
-                        }
-                    )
-                }
-
-                item {
-                    Text(
-                        color = MaterialTheme.colorScheme.onBackground,
-                        text = "Tipo",
-                        modifier = Modifier.padding(start = 10.dp),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = MaterialTheme.typography.titleMedium.fontSize
-                    )
-                    TypeUser(value = user.type, onChange = {
-                        user = user.copy(
-                            type = it
-                        )
-                    })
-                }
-
-                item { Spacer(modifier = Modifier.size(100.dp)) } // To ensure button is not overlapped
-            }
-
-            Button(
-                onClick = {
+                Button(onClick = {
                     registerUser(navController, user)
+                    Toast.makeText(context, "Usuario registrado", Toast.LENGTH_SHORT).show()
                     user = UserData()
                 },
-                shape = RoundedCornerShape(5.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onSurface,
-                    contentColor = MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Text(
-                    fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
-                    style = MaterialTheme.typography.titleMedium,
-                    text = "Registrar"
-                )
+                    shape = RoundedCornerShape(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onSurface,
+                        contentColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Text(
+                        fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
+                        style = MaterialTheme.typography.titleMedium,
+                        text = "Registrar")
+                }
             }
-        }
-    }
+
+        } //Column
+
+    } //Scaffold
 }
+
 fun registerUser( navController: NavController, user: UserData) {
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
@@ -548,6 +536,7 @@ fun EmailField(
 @Composable
 fun TypeUser(value: String, onChange: (String) -> Unit){
     var isExpanded by remember { mutableStateOf(false) }
+//    var typeUser by remember { mutableStateOf("") }
 
     ExposedDropdownMenuBox(expanded = isExpanded, onExpandedChange = { isExpanded = !isExpanded} )
     {
